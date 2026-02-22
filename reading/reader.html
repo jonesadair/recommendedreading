@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>reading...</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #00001a;
+            color: #00bfff;
+            font-family: 'Consolas', 'Monaco', 'Lucida Console', monospace;
+            font-size: 12px;
+        }
+
+        .reader-header {
+            background-color: rgba(0, 0, 26, 0.95);
+            border-bottom: 1px solid #00bfff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .book-info {
+            flex: 1;
+        }
+
+        .book-title {
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+        .book-author {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-btn {
+            background: transparent;
+            border: 1px solid #00bfff;
+            color: #00bfff;
+            padding: 5px 12px;
+            cursor: pointer;
+            font-family: 'Consolas', 'Monaco', 'Lucida Console', monospace;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            background-color: #00bfff;
+            color: #00001a;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: #00bfff;
+            border: 1px solid #00bfff;
+            padding: 5px 12px;
+            font-size: 11px;
+        }
+
+        .back-btn:hover {
+            background-color: #00bfff;
+            color: #00001a;
+        }
+
+        #reader-container {
+            margin-top: 60px;
+            padding: 40px 20px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #content {
+            color: #d0d0d0;
+            line-height: 1.8;
+            font-family: Georgia, serif;
+            font-size: 16px;
+        }
+
+        #content p {
+            margin-bottom: 1.2em;
+            color: #d0d0d0 !important;
+            text-decoration: none !important;
+        }
+
+        #content h1, #content h2, #content h3, #content h4, #content h5, #content h6 {
+            color: #00bfff;
+            margin-top: 2em;
+            margin-bottom: 0.8em;
+            text-decoration: none !important;
+        }
+
+        #content a {
+            color: inherit !important;
+            text-decoration: none !important;
+        }
+
+        #content img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 2em auto;
+        }
+
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            color: #00bfff;
+            text-align: center;
+        }
+
+        .error-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff0066;
+            text-align: center;
+            max-width: 500px;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .reader-header {
+                padding: 8px 15px;
+            }
+
+            #reader-container {
+                padding: 20px 15px;
+            }
+
+            #content {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="reader-header">
+        <div class="book-info">
+            <div class="book-title" id="book-title">loading...</div>
+            <div class="book-author" id="book-author"></div>
+        </div>
+        <div class="controls">
+            <button class="control-btn" id="font-smaller">A-</button>
+            <button class="control-btn" id="font-larger">A+</button>
+            <a href="reading-library.html" class="back-btn">[← back to library]</a>
+        </div>
+    </div>
+
+    <div id="reader-container">
+        <div class="loading" id="loading">loading epub...</div>
+        <div id="content"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const epubFile = urlParams.get('file');
+
+        if (!epubFile) {
+            document.getElementById('loading').innerHTML = '<div class="error-message">no epub file specified<br><br><a href="reading-library.html" class="back-btn">[← back to library]</a></div>';
+            throw new Error('No epub file specified');
+        }
+
+        let currentFontSize = 16;
+
+        async function loadEpub(url) {
+            try {
+                console.log('Fetching:', url);
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch epub: ' + response.status);
+                }
+                
+                const arrayBuffer = await response.arrayBuffer();
+                console.log('Loaded epub, size:', arrayBuffer.byteLength);
+                
+                const zip = await JSZip.loadAsync(arrayBuffer);
+                console.log('Unzipped epub');
+                
+                const containerXml = await zip.file('META-INF/container.xml').async('string');
+                const opfPath = containerXml.match(/full-path="([^"]+)"/)[1];
+                console.log('OPF path:', opfPath);
+                
+                const opfContent = await zip.file(opfPath).async('string');
+                const opfDir = opfPath.substring(0, opfPath.lastIndexOf('/') + 1);
+                
+                const titleMatch = opfContent.match(/<dc:title[^>]*>([^<]+)<\/dc:title>/);
+                const authorMatch = opfContent.match(/<dc:creator[^>]*>([^<]+)<\/dc:creator>/);
+                
+                document.getElementById('book-title').textContent = titleMatch ? titleMatch[1] : 'untitled';
+                document.getElementById('book-author').textContent = authorMatch ? 'by ' + authorMatch[1] : '';
+                document.title = titleMatch ? titleMatch[1] : 'reading...';
+                
+                const spineItems = [];
+                const manifestItems = {};
+                
+                const parser = new DOMParser();
+                const opfDoc = parser.parseFromString(opfContent, 'text/xml');
+                
+                const manifestElements = opfDoc.querySelectorAll('manifest item');
+                manifestElements.forEach(function(item) {
+                    const id = item.getAttribute('id');
+                    const href = item.getAttribute('href');
+                    if (id && href) {
+                        manifestItems[id] = href;
+                    }
+                });
+                
+                console.log('Manifest items:', Object.keys(manifestItems).length);
+                
+                const spineElements = opfDoc.querySelectorAll('spine itemref');
+                spineElements.forEach(function(itemref) {
+                    const idref = itemref.getAttribute('idref');
+                    if (idref && manifestItems[idref]) {
+                        spineItems.push(opfDir + manifestItems[idref]);
+                    }
+                });
+                
+                console.log('Spine items:', spineItems.length);
+                
+                const contentDiv = document.getElementById('content');
+                contentDiv.innerHTML = '';
+                
+                for (let i = 0; i < spineItems.length; i++) {
+                    const itemPath = spineItems[i];
+                    try {
+                        const content = await zip.file(itemPath).async('string');
+                        
+                        const bodyMatch = content.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+                        if (bodyMatch) {
+                            const chapter = document.createElement('div');
+                            chapter.innerHTML = bodyMatch[1];
+                            
+                            // Get the directory of the current chapter
+                            const chapterDir = itemPath.substring(0, itemPath.lastIndexOf('/') + 1);
+                            
+                            // Fix image paths - convert to data URLs
+                            const images = chapter.querySelectorAll('img');
+                            const imagePromises = [];
+                            
+                            images.forEach(function(img) {
+                                const imgSrc = img.getAttribute('src');
+                                if (imgSrc) {
+                                    // Resolve relative path
+                                    let imgPath = imgSrc;
+                                    
+                                    if (imgSrc.startsWith('../')) {
+                                        // Go up one directory from chapter location
+                                        const parentDir = chapterDir.substring(0, chapterDir.lastIndexOf('/', chapterDir.length - 2) + 1);
+                                        imgPath = parentDir + imgSrc.substring(3); // Remove ../
+                                    } else if (!imgSrc.startsWith('/')) {
+                                        // Relative path - combine with chapter directory
+                                        imgPath = chapterDir + imgSrc;
+                                    } else {
+                                        // Absolute path - remove leading slash
+                                        imgPath = imgSrc.substring(1);
+                                    }
+                                    
+                                    console.log('Loading image:', imgPath);
+                                    
+                                    const imgFile = zip.file(imgPath);
+                                    if (imgFile) {
+                                        const promise = imgFile.async('base64').then(function(base64) {
+                                            const ext = imgPath.split('.').pop().toLowerCase();
+                                            const mimeType = ext === 'png' ? 'image/png' : 
+                                                           ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' : 
+                                                           ext === 'gif' ? 'image/gif' : 'image/jpeg';
+                                            img.src = 'data:' + mimeType + ';base64,' + base64;
+                                            console.log('Loaded image:', imgPath);
+                                        }).catch(function(err) {
+                                            console.error('Error loading image:', imgPath, err);
+                                        });
+                                        imagePromises.push(promise);
+                                    } else {
+                                        console.warn('Image file not found in epub:', imgPath);
+                                    }
+                                }
+                            });
+                            
+                            // Remove superscript footnote markers
+                            const sups = chapter.querySelectorAll('sup');
+                            sups.forEach(function(sup) {
+                                if (/^\d+$/.test(sup.textContent.trim())) {
+                                    sup.remove();
+                                }
+                            });
+                            
+                            contentDiv.appendChild(chapter);
+                        }
+                    } catch (e) {
+                        console.warn('Could not load:', itemPath, e);
+                    }
+                }
+                
+                document.getElementById('loading').style.display = 'none';
+                console.log('Epub loaded successfully');
+                
+            } catch (error) {
+                console.error('Error loading epub:', error);
+                document.getElementById('loading').innerHTML = 
+                    '<div class="error-message">error loading epub<br>' + error.message + '<br><br><a href="reading-library.html" class="back-btn">[← back to library]</a></div>';
+            }
+        }
+
+        document.getElementById('font-smaller').addEventListener('click', function() {
+            currentFontSize = Math.max(12, currentFontSize - 2);
+            document.getElementById('content').style.fontSize = currentFontSize + 'px';
+        });
+
+        document.getElementById('font-larger').addEventListener('click', function() {
+            currentFontSize = Math.min(24, currentFontSize + 2);
+            document.getElementById('content').style.fontSize = currentFontSize + 'px';
+        });
+
+        loadEpub(epubFile);
+    </script>
+</body>
+</html>
