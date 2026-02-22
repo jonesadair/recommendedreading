@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>recommended reading library</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #00001a;
+            color: #00bfff;
+            font-family: 'Consolas', 'Monaco', 'Lucida Console', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Glow-in-dark star constellation background */
+        .stars-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .star {
+            position: absolute;
+            opacity: 0.4;
+            animation: twinkle 4s ease-in-out infinite;
+        }
+
+        /* Vary star sizes */
+        .star.small { 
+            font-size: 10px; 
+            opacity: 0.3;
+            animation-duration: 3s;
+        }
+        .star.medium { 
+            font-size: 14px; 
+            opacity: 0.4;
+            animation-duration: 4s;
+        }
+        .star.large { 
+            font-size: 18px; 
+            opacity: 0.5;
+            animation-duration: 5s;
+        }
+
+        /* Soft twinkle animation */
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Make decorative symbols white */
+        .decorative-symbol {
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            border: 1px solid #00bfff;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: rgba(0, 0, 26, 0.85);
+        }
+
+        .header h1 {
+            font-size: 12px;
+            font-weight: normal;
+            margin-bottom: 10px;
+        }
+
+        .prompt {
+            color: #00bfff;
+        }
+
+        .cursor {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .content {
+            border: 1px solid #00bfff;
+            padding: 15px;
+            background-color: rgba(0, 0, 26, 0.85);
+        }
+
+        .breadcrumb {
+            margin-bottom: 15px;
+            color: #00bfff;
+        }
+
+        .divider {
+            margin: 10px 0;
+            border-bottom: 1px solid #00bfff;
+        }
+
+        .book-item {
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid #00bfff;
+        }
+
+        .book-title {
+            margin-bottom: 5px;
+        }
+
+        .book-author {
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+
+        .book-notes {
+            margin-top: 5px;
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        a {
+            color: #00bfff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            background-color: #00bfff;
+            color: #00001a;
+        }
+
+        .back-link {
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        .back-link:hover {
+            background-color: #00bfff;
+            color: #00001a;
+        }
+
+        .section {
+            margin: 20px 0;
+        }
+
+        .section-title {
+            margin-bottom: 10px;
+            padding: 5px;
+            border-bottom: 1px solid #00bfff;
+        }
+
+        input[type="text"]::placeholder {
+            color: #ffffff;
+            opacity: 0.6;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+        }
+
+        /* Mobile responsive font sizes */
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+            #search-input {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .section {
+                margin: 15px 0;
+            }
+            
+            .filter-btn, .sort-btn {
+                display: inline-block;
+                margin: 3px 4px !important;
+                padding: 3px 8px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                font-size: 15px;
+                padding: 10px;
+            }
+            #search-input {
+                width: 100%;
+            }
+            
+            .content {
+                padding: 10px;
+            }
+            
+            .section {
+                margin: 12px 0;
+            }
+            
+            .filter-btn, .sort-btn {
+                display: inline-block;
+                margin: 3px 3px !important;
+                padding: 4px 10px !important;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Star constellation background -->
+    <div class="stars-bg" id="stars-bg"></div>
+
+    <div class="container">
+        <div class="header">
+            <div style="border: 1px solid #00bfff; padding: 10px;">
+                <div style="margin-bottom: 8px;">adair's personal collection of essential texts</div>
+                <div><span class="prompt">></span> filter by category below<span class="cursor">_</span></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="breadcrumb">> home > archives > recommended reading library ✦</div>
+            <div class="divider"></div>
+            <div style="text-align: center; margin: 10px 0;">✧ ° ✦ • ˚ ⋆ ˚ • ✦ ° ✧</div>
+
+            <!-- FILTER BUTTONS AND SEARCH -->
+            <div style="margin: 15px 0;">
+                <div style="margin-bottom: 10px;">
+                    <span class="prompt">></span> filter: 
+                    <a href="#" class="filter-btn" data-filter="all" style="margin: 0 5px; padding: 3px 8px; border: 1px solid #00bfff;">[all]</a>
+                    <a href="#" class="filter-btn" data-filter="art" style="margin: 0 5px; padding: 3px 8px; border: 1px solid #00bfff;">[art]</a>
+                    <a href="#" class="filter-btn" data-filter="fiction" style="margin: 0 5px; padding: 3px 8px; border: 1px solid #00bfff;">[fiction]</a>
+                    <a href="#" class="filter-btn" data-filter="funny" style="margin: 0 5px; padding: 3px 8px; border: 1px solid #00bfff;">[funny]</a>
+                    <a href="#" class="filter-btn" data-filter="nonfiction" style="margin: 0 5px; padding: 3px 8px; border: 1px solid #00bfff;">[nonfiction]</a>
+                </div>
+                <div style="margin-top: 10px; margin-bottom: 10px;">
+                    <span class="prompt">></span> search: 
+                    <input type="text" id="search-input" placeholder="type title or author..." style="background-color: #00001a; color: #00bfff; border: 1px solid #00bfff; padding: 3px 8px; font-family: 'Consolas', 'Monaco', 'Lucida Console', monospace; font-size: 12px; width: 300px;">
+                </div>
+                <div style="margin-top: 10px;">
+                    <span class="prompt">></span> sort: 
+                    <a href="#" class="sort-btn" data-sort="default" style="margin: 0 5px; padding: 3px 8px; border: 1px solid #00bfff;">[default]</a>
+                    <a href="#" class="sort-btn" data-sort="oldest" style="margin: 0 5px; padding: 3px 8px; border: 1px solid #00bfff;">[oldest first]</a>
+                    <a href="#" class="sort-btn" data-sort="newest" style="margin: 0 5px; padding: 3px 8px; border: 1px solid #00bfff;">[newest first]</a>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- BOOKS SECTION -->
+            <div id="books-container" style="margin-top: 20px;">
+                
+                <!-- AGAINST THE GRAIN -->
+                <div class="book-item" data-category="nonfiction" data-title="against the grain" data-author="james c. scott" data-year="2017">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> against the grain</div>
+                    <div class="book-author">by james c. scott (2017)</div>
+                    <div class="book-notes">Neolithic Age Mindset</div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=grain.epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="grain.epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+                <!-- ANIMAL FARM -->
+                <div class="book-item" data-category="funny fiction" data-title="animal farm" data-author="george orwell" data-year="1945">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> animal farm</div>
+                    <div class="book-author">by george orwell (1945)</div>
+                    <div class="book-notes">FUNNIER THAN YOU REMEMBER. First sentence: "Mr. Jones, of the Manor Farm, had locked the hen-houses for the night, but was too drunk to remember to shut the pop-holes."</div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=Animal.epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="Animal.epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+                <!-- ANNA KARENINA -->
+                <div class="book-item" data-category="fiction" data-title="anna karenina" data-author="leo tolstoy" data-year="1877">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> anna karenina</div>
+                    <div class="book-author">by leo tolstoy (1877)</div>
+                    <div class="book-notes">Levin is my favorite character.</div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=Anna.epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="Anna.epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+                <!-- BRAVE NEW WORLD -->
+                <div class="book-item" data-category="fiction" data-title="brave new world" data-author="aldous huxley" data-year="1932">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> brave new world</div>
+                    <div class="book-author">by aldous huxley (1932)</div>
+                    <div class="book-notes"><a href="https://www.youtube.com/watch?v=NWOoiMtevdY" target="_blank" onclick="event.stopPropagation()">[watch]</a></div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=brave.epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="brave.epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+                <!-- ANSWERED PRAYERS -->
+                <div class="book-item" data-category="funny fiction nonfiction" data-title="answered prayers" data-author="truman capote" data-year="1987">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> answered prayers</div>
+                    <div class="book-author">by truman capote (1987)</div>
+                    <div class="book-notes">The OG auto fictionist and cancelled legend</div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=capote.epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="capote.epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+                <!-- CATCH-22 -->
+                <div class="book-item" data-category="funny" data-title="catch-22" data-author="joseph heller" data-year="1961">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> catch-22</div>
+                    <div class="book-author">by joseph heller (1961)</div>
+                    <div class="book-notes">just read the first sentence and keep going. my favorite book of all time... atm.</div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=Catch22.epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="Catch22.epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+                <!-- CAT'S CRADLE -->
+                <div class="book-item" data-category="funny" data-title="cat's cradle" data-author="kurt vonnegut" data-year="1963">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> cat's cradle</div>
+                    <div class="book-author">by kurt vonnegut (1963)</div>
+                    <div class="book-notes">bible if the bible was funnier</div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=CatsCradle.epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="CatsCradle.epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+                <!-- HOMAGE TO CATALONIA -->
+                <div class="book-item" data-category="funny" data-title="homage to catalonia" data-author="george orwell" data-year="1938">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> homage to catalonia</div>
+                    <div class="book-author">by george orwell (1938)</div>
+                    <div class="book-notes">orwell's personal account of randomly enlisting in the POUM, an anti-Stalinist communist party, during the Spanish Civil War as a young man. written long before 1984 and animal farm.</div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=Homage .epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="Homage .epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+                <!-- INVITATION TO A BEHEADING -->
+                <div class="book-item" data-category="fiction" data-title="invitation to a beheading" data-author="vladimir nabokov" data-year="1959">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> invitation to a beheading</div>
+                    <div class="book-author">by vladimir nabokov (1959)</div>
+                    <div class="book-notes">have not yet read any nabokov, but recently learned my biological grandfather loved his work. join me down the rabbit hole...</div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=behead.epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="behead.epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+                <!-- LAUGHABLE LOVES -->
+                <div class="book-item" data-category="funny" data-title="laughable loves" data-author="milan kundera" data-year="1969">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> laughable loves</div>
+                    <div class="book-author">by milan kundera (1969)</div>
+                    <div class="book-notes">romcom but better</div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=Laughable.epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="Laughable.epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+                <!-- MY ANTONIA -->
+                <div class="book-item" data-category="fiction" data-title="my antonia" data-author="willa cather" data-year="1918">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> my antonia</div>
+                    <div class="book-author">by willa cather (1918)</div>
+                    <div class="book-notes">sad but beautiful</div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=antonia.epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="antonia.epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+                <!-- OIL! -->
+                <div class="book-item" data-category="funny" data-title="oil!" data-author="upton sinclair" data-year="1927">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> oil!</div>
+                    <div class="book-author">by upton sinclair (1927)</div>
+                    <div class="book-notes">NOTHING LIKE THERE WILL BE BLOOD. that movie is looooooosely based on small bits and premises of this book, but this book is so much more than that movie. different plot, characters, and soooooooo much funnier.</div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=Oil!.epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="Oil!.epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+                <!-- SEEING LIKE A STATE -->
+                <div class="book-item" data-category="nonfiction" data-title="seeing like a state" data-author="james c. scott" data-year="1998">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> seeing like a state</div>
+                    <div class="book-author">by james c. scott (1998)</div>
+                    <div class="book-notes">last names were made for tax purposes, and other truths...</div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=state.epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="state.epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+                <!-- THE BIRDS -->
+                <div class="book-item" data-category="funny fiction" data-title="the birds" data-author="aristophanes" data-year="-414">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> the birds</div>
+                    <div class="book-author">by aristophanes (414 BC)</div>
+                    <div class="book-notes">Be ready to be amazed by the humor of a 5th century BC play that reads like a modern satirical skit.</div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=birds.epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="birds.epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+                <!-- THE SIRENS OF TITAN -->
+                <div class="book-item" data-category="funny" data-title="the sirens of titan" data-author="kurt vonnegut" data-year="1959">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> the sirens of titan</div>
+                    <div class="book-author">by kurt vonnegut (1959)</div>
+                    <div class="book-notes">'Once upon a time on Tralfamadore there were creatures who weren't anything like machines. They weren't dependable. They weren't efficient. They weren't predictable. They weren't durable. And these poor creatures were obsessed by the idea that everything that existed had to have a purpose, and that some purposes were higher than others. These creatures spent most of their time trying to find out what their purpose was. And every time they found out what seemed to be a purpose of themselves, the purpose seemed so low that the creatures were filled with disgust and shame. And, rather than serve such a low purpose, the creatures would make a machine to serve it. This left the creatures free to serve higher purposes. But whenever they found a higher purpose, the purpose still wasn't high enough. So machines were made to serve higher purposes, too. And the machines did everything so expertly that they were finally given the job of finding out what the highest purpose of the creatures could be. The machines reported in all honesty that the creatures couldn't really be said to have any purpose at all. The creatures thereupon began slaying each other, because they hated purposeless things above all else. And they discovered that they weren't even very good at slaying. So they turned that job over to the machines, too. And the machines finished up the job in less time than it takes to say, "Tralfamadore."'</div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=titan.epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="titan.epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+                <!-- THE UNBEARABLE LIGHTNESS OF BEING -->
+                <div class="book-item" data-category="funny" data-title="the unbearable lightness of being" data-author="milan kundera" data-year="1984">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> the unbearable lightness of being</div>
+                    <div class="book-author">by milan kundera (1984)</div>
+                    <div class="book-notes">romcom but better</div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=unbearable.epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="unbearable.epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+                <!-- THEATROCRACY -->
+                <div class="book-item" data-category="art nonfiction" data-title="theatrocracy" data-author="peter meineck" data-year="2017">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> theatrocracy</div>
+                    <div class="book-author">by peter meineck (2017)</div>
+                    <div class="book-notes">About the BIRTH of theatre and the consequences on neural pathways and social consciousness</div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=Theatrocracy.epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="Theatrocracy.epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+                <!-- THIS SIDE OF PARADISE -->
+                <div class="book-item" data-category="funny fiction nonfiction" data-title="this side of paradise" data-author="f. scott fitzgerald" data-year="1920">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> this side of paradise</div>
+                    <div class="book-author">by f. scott fitzgerald (1920)</div>
+                    <div class="book-notes">His first novel, completely auto fiction, that he published after NOT throwing himself over the roof terrace of the Yale Club, which he threatened to do while standing over the railing.</div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=Paradise.epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="Paradise.epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+                <!-- WALKING THROUGH CLEAR WATER -->
+                <div class="book-item" data-category="art funny nonfiction" data-title="walking through clear water in a pool painted black" data-author="cookie mueller" data-year="1990">
+                    <div class="book-title"><span class="decorative-symbol">✦</span> walking through clear water in a pool painted black</div>
+                    <div class="book-author">by cookie mueller (1990)</div>
+                    <div class="book-notes">Actress in early John waters films teaches you diy heroin overdose solution and many other things</div>
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <a href="reader.html?file=cookie.epub" onclick="event.stopPropagation()">[read in browser]</a>
+                        <span style="opacity: 0.5;"> | </span>
+                        <a href="cookie.epub" download onclick="event.stopPropagation()">[download epub]</a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div style="text-align: center; margin: 15px 0;">⋆ • ✦ ˚ ° ✧ ° ˚ ✦ • ⋆</div>
+
+            <div class="back-link">
+                <div class="divider"></div>
+                <span class="prompt">></span> <a href="portfolio_decorated.html">return to portfolio</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Generate random star constellation background
+        function createStarBackground() {
+            const starsBg = document.getElementById('stars-bg');
+            const starSymbols = ['✧', '°', '✦', '•', '˚', '⋆', '☆', '✵', '∘', '◦'];
+            const sizes = ['small', 'medium', 'large'];
+            const numStars = 120; // Original stars
+            const numBrightStars = 24; // 20% more, brighter stars
+
+            // Create original stars
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star ' + sizes[Math.floor(Math.random() * sizes.length)];
+                star.textContent = starSymbols[Math.floor(Math.random() * starSymbols.length)];
+                
+                // Random position
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                
+                // Random animation delay for staggered twinkling
+                star.style.animationDelay = Math.random() * 4 + 's';
+                
+                starsBg.appendChild(star);
+            }
+            
+            // Create brighter stars (20% more)
+            for (let i = 0; i < numBrightStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star ' + sizes[Math.floor(Math.random() * sizes.length)];
+                star.textContent = starSymbols[Math.floor(Math.random() * starSymbols.length)];
+                
+                // Random position
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                
+                // Make these stars brighter/whiter
+                star.style.color = 'rgba(255, 255, 255, 0.9)';
+                star.style.textShadow = '0 0 3px rgba(255, 255, 255, 0.8)';
+                
+                // Random animation delay for staggered twinkling
+                star.style.animationDelay = Math.random() * 4 + 's';
+                
+                starsBg.appendChild(star);
+            }
+        }
+
+        // Create stars on page load
+        createStarBackground();
+
+        // Filter functionality
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const sortBtns = document.querySelectorAll('.sort-btn');
+        const bookItems = document.querySelectorAll('.book-item');
+        const booksContainer = document.getElementById('books-container');
+        const searchInput = document.getElementById('search-input');
+        let activeFilter = 'all';
+        let activeSort = 'default';
+
+        // Store original order
+        const originalOrder = Array.from(bookItems);
+
+        // Category filter
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                activeFilter = this.getAttribute('data-filter');
+                applyFilters();
+
+                // Visual feedback for active filter
+                filterBtns.forEach(b => {
+                    b.style.backgroundColor = 'transparent';
+                    b.style.color = '#00bfff';
+                });
+                this.style.backgroundColor = '#00bfff';
+                this.style.color = '#00001a';
+            });
+        });
+
+        // Sort functionality
+        sortBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                activeSort = this.getAttribute('data-sort');
+                applySort();
+
+                // Visual feedback for active sort
+                sortBtns.forEach(b => {
+                    b.style.backgroundColor = 'transparent';
+                    b.style.color = '#00bfff';
+                });
+                this.style.backgroundColor = '#00bfff';
+                this.style.color = '#00001a';
+            });
+        });
+
+        // Search functionality
+        searchInput.addEventListener('input', function() {
+            applyFilters();
+        });
+
+        // Combined filter function
+        function applyFilters() {
+            const searchTerm = searchInput.value.toLowerCase();
+
+            bookItems.forEach(book => {
+                const categories = book.getAttribute('data-category').split(' ');
+                const title = book.getAttribute('data-title').toLowerCase();
+                const author = book.getAttribute('data-author').toLowerCase();
+
+                const categoryMatch = activeFilter === 'all' || categories.includes(activeFilter);
+                const searchMatch = searchTerm === '' || title.includes(searchTerm) || author.includes(searchTerm);
+
+                book.style.display = (categoryMatch && searchMatch) ? 'block' : 'none';
+            });
+        }
+
+        // Sort function
+        function applySort() {
+            const sortedBooks = Array.from(bookItems);
+
+            if (activeSort === 'oldest') {
+                sortedBooks.sort((a, b) => {
+                    const yearA = parseInt(a.getAttribute('data-year')) || 0;
+                    const yearB = parseInt(b.getAttribute('data-year')) || 0;
+                    return yearA - yearB; // Oldest first
+                });
+            } else if (activeSort === 'newest') {
+                sortedBooks.sort((a, b) => {
+                    const yearA = parseInt(a.getAttribute('data-year')) || 0;
+                    const yearB = parseInt(b.getAttribute('data-year')) || 0;
+                    return yearB - yearA; // Newest first
+                });
+            } else {
+                // Default order - restore original
+                sortedBooks.sort((a, b) => {
+                    return originalOrder.indexOf(a) - originalOrder.indexOf(b);
+                });
+            }
+
+            // Re-append in sorted order
+            sortedBooks.forEach(book => {
+                booksContainer.appendChild(book);
+            });
+
+            // Re-apply filters after sorting
+            applyFilters();
+        }
+
+        // Set "all" and "default" as active
+        document.querySelector('[data-filter="all"]').style.backgroundColor = '#00bfff';
+        document.querySelector('[data-filter="all"]').style.color = '#00001a';
+        document.querySelector('[data-sort="default"]').style.backgroundColor = '#00bfff';
+        document.querySelector('[data-sort="default"]').style.color = '#00001a';
+    </script>
+</body>
+</html>
